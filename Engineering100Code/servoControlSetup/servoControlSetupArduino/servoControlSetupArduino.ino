@@ -1,14 +1,14 @@
-const int ledTL = 13;
-const int ledTR = 11;
-const int ledBL = 10;
-const int ledBR = 9;
+#include <Servo.h>
+Servo servoVertical;
+Servo servoHorizontal;
+
+const int servoVerticalPin = 8;
+const int servoHorizontalPin = 7;
 
 void setup() {
   // put your setup code here, to run once:
-  pinMode(ledTL, OUTPUT);
-  pinMode(ledTR, OUTPUT);
-  pinMode(ledBL, OUTPUT);
-  pinMode(ledBR, OUTPUT);
+  servoVerical.attach(servoVerticalPin);
+  servoHorizontal.attach(servoHorizontalPin);
   Serial.begin(9600);
 }
 
@@ -24,17 +24,19 @@ void loop() {
   digitalWrite(ledBR, LOW);
   if(Serial.available() > 0){
      char ledPinState = Serial.read();
-     if(ledPinState == '1'){
+     
+     if(ledPinState == '1'){ //Up
       digitalWrite(ledTL, HIGH);
       digitalWrite(ledTR, LOW);
-     }else if(ledPinState == '2'){
+     }else if(ledPinState == '2'){ //Down
       digitalWrite(ledTL, LOW);
       digitalWrite(ledTR, HIGH);
      }
-     if(ledPinState == '3'){
+     
+     if(ledPinState == '3'){ //Left
       digitalWrite(ledBL, HIGH);
       digitalWrite(ledBR, LOW);
-     }else if(ledPinState == '4'){
+     }else if(ledPinState == '4'){ //Right
       digitalWrite(ledBL, LOW);
       digitalWrite(ledBR, HIGH);
      } 
