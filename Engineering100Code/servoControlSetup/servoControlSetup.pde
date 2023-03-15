@@ -23,12 +23,13 @@ void draw(){
       infoPort.write('0');
       movementOn = false;
       print("Inactive");
+      delay(100);
   }
   if(movementOn){
     if(mouseCoords[0] <= 188){ //Left
-      //print("Left");
+      print("Left");
       if(mouseCoords[1] <= 190){ //Up
-        //print("Up");
+        print("Up");
         infoPort.write('1');
       } else { //Down
         //print("Down");
