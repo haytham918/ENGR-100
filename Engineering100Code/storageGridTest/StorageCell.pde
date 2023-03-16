@@ -54,7 +54,6 @@ public class StorageCell{
     hoveringToggle = false;
     //Start off at ten opacity.
     tintIndex = 50;
-    updateCellVisual();
   }
   
   public void changeHoveringState(){

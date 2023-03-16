@@ -71,6 +71,10 @@ void draw(){
   
   stroke(204, 102, 0);
   point(mouseX, mouseY);
+  print(mouseGridRegion[0]);
+  print(mouseGridRegion[1]);
+  print(prevGridRegion[0]);
+  print(prevGridRegion[1]);
   
   overGrid = mouseWithinGrid();
   if(overGrid){
