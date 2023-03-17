@@ -21,11 +21,11 @@ int[] mouseGridRegion = new int[2];
 int[] prevGridRegion = new int[2];
 //Gets modulo for mouse position in x and y coords
 int[] positionRounding = new int[2];
-boolean overGrid = false;
+boolean withGrid = false;
 
 void setup(){
   size(362, 562);
-  noCursor();
+  cursor(HAND);
   strokeWeight(5);
   gridBackground = loadImage("backgroundChess55.png");
   
@@ -70,46 +70,12 @@ void draw(){
   //Make condition for when mouse is outside grid...
   
   stroke(204, 102, 0);
-  point(mouseX, mouseY);
-  
-  overGrid = mouseWithinGrid();
-  if(overGrid){
-    
-    //Update current coordinate position.
-    positionRounding[0] = mouseX % 50;
-    positionRounding[1] = mouseY % 50;
-    
-    mouseGridRegion[0] = (mouseX - positionRounding[0] - 50)/50;
-    mouseGridRegion[1] = (mouseY - positionRounding[1] - 50)/50;
-    
-    //First ensure that pointer was not in same position
-    //Either x or y coord must be different
-    if((prevGridRegion[0] != mouseGridRegion[0]) || (prevGridRegion[1] != mouseGridRegion[1])){
-      updateCellRegion(mouseGridRegion[0], mouseGridRegion[1]);
-      
-      //To ensure neither x or y of prev region are outside bounds
-      if((prevGridRegion[0] != -1) && (prevGridRegion[1] != -1)){
-        updateCellRegion(prevGridRegion[0], prevGridRegion[1]);
-      }
-    }
-    
-    
-    //Update previous grid region to now be current grid region (for next loop)
-    prevGridRegion[0] = mouseGridRegion[0];
-    prevGridRegion[1] = mouseGridRegion[1];
-    
-  } else {
-    mouseGridRegion[0] = -1;
-    mouseGridRegion[1] = -1;
-    
-    if((prevGridRegion[0] != -1) && (prevGridRegion[1] != -1)){
-      updateCellRegion(prevGridRegion[0], prevGridRegion[1]);
-      prevGridRegion[0] = -1;
-      prevGridRegion[1] = -1;
-    }
-    //Set prevGridRegion to -1 -1 as well.
+  withGrid = mouseWithinGrid();
+  if(withGrid && mousePressed)
+  {
+      updateCellRegion(mouseX, mouseY);
   }
-  //rect((mouseGridRegion[0]+1)*50, (mouseGridRegion[1]+1)*50, 50, 50)
+  
   delay(100);
 }
 
@@ -123,6 +89,8 @@ boolean mouseWithinGrid(){
 }
 
 public void updateCellRegion(int x, int y){
-    gridCells[x][y].changeHoveringState();
-    gridCells[x][y].updateCellVisual();
+    int indexRow = ((x-12) / 50) - 1;
+    int indexCol = ((y-12) / 50) - 1;
+    gridCells[indexRow][indexCol].changeHoveringState();
+
 }

@@ -54,70 +54,28 @@ public class StorageCell{
     hoveringToggle = false;
     //Start off at ten opacity.
     tintIndex = 50;
-    updateCellVisual();
+    tint(tintIndex);
   }
   
   public void changeHoveringState(){
-    if(hoveringToggle){
-      //Has left region, no longer hovering over
-      
-      //If not selected, return color to gray
-      if(!selectionToggle){
-        selectionColor[0] = 102;
-        selectionColor[1] = 153;
-        selectionColor[2] = 204;
-      }
-
-      hoveringToggle = false;
-      tintIndex -= 77;
-    } else {
-      //Has entered region, currently hovering over
-      
-      //If not already selected, update color to reflect hovering
-      if(!selectionToggle){
-        selectionColor[0] = 255;
-        selectionColor[1] = 87;
-        selectionColor[2] = 51;
-      }
-      hoveringToggle = true;
-      tintIndex += 77;
+    if(!selectionToggle)
+    {
+       selectionToggle = true;
+       selectionColor[0] = 20;
+       selectionColor[1] = 100;
+       selectionColor[2] = 120;
+       updateCellVisual();
+    }
+    else 
+    {
+       System.out.println("Please select another position");
     }
   }
-  
-  public void changeClickedState(){
-    if(selectionToggle){
-      //The button has been deselected
-      
-      //Set button back to hovering color
-      selectionColor[0] = 255;
-      selectionColor[1] = 87;
-      selectionColor[2] = 51;
-      
-      selectionToggle = false;
-      tintIndex -= 127;
-    } else {
-      //The button has been selected
-      
-      //Set button to selected color
-      selectionColor[0] = 57;
-      selectionColor[1] = 255;
-      selectionColor[2] = 20;
-      
-      selectionToggle = true;
-      tintIndex += 127;
-    }
-  }
-  
-  //Modes are 0, 1, 2, 3
-  //Leave for later...
-  //public void modeChanged(){
-  
-  //}
+ 
   
   public void updateCellVisual(){
-    rect(cornerCoords[0], cornerCoords[1], cellWidth, cellHeight);
     fill(selectionColor[0], selectionColor[1], selectionColor[2]);
-    tint(tintIndex);
+    rect(cornerCoords[0], cornerCoords[1], cellWidth, cellHeight);
   }
   
 }
