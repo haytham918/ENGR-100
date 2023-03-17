@@ -11,10 +11,10 @@ public class StorageCell{
   //private int previousState;
   
   private int[] selectionColor = new int[3];
-  private boolean selectionToggle;
+  private boolean selectionToggle = false;
   
   
-  private boolean hoveringToggle;
+  private boolean isOccupied;
   private int tintIndex;
   
   //private string[] storageItemData;
@@ -40,21 +40,17 @@ public class StorageCell{
     cellWidth = w;
     cellHeight = h;
     
-    //For more advanced version
-    //selectionState = 0;
-    
-    //RGB values, in that order
-    //made gray to start off
-    selectionColor[0] = 102;
-    selectionColor[1] = 153;
-    selectionColor[2] = 204;
-    
     //Is selected?
     selectionToggle = false;
-    hoveringToggle = false;
+    isOccupied = false;
     //Start off at ten opacity.
     tintIndex = 50;
     tint(tintIndex);
+  }
+  
+  public void setToggleDefault()
+  {
+     selectionToggle = false;
   }
   
   public void changeHoveringState(){
@@ -65,10 +61,13 @@ public class StorageCell{
        selectionColor[1] = 100;
        selectionColor[2] = 120;
        updateCellVisual();
+       pickedFrom = true;
+       createConfirmation();
     }
     else 
     {
        System.out.println("Please select another position");
+
     }
   }
  
