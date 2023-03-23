@@ -66,7 +66,6 @@ public class StorageCell{
        selectionColor[1] = 100;
        selectionColor[2] = 120;
        updateCellVisual();
-       pickedFrom = true;
        createConfirmation();
     }
     else 
@@ -85,7 +84,6 @@ public class StorageCell{
        selectionColor[1] = 200;
        selectionColor[2] = 110;
        updateCellVisual();
-       pickedDest = true;
        createConfirmation();
     }
     else 

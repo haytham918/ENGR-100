@@ -21,15 +21,35 @@ int[] fromPosition= new int[2];
 int[] destPosition = new int[2];
 
 boolean withGrid = false;
-boolean pickFrom = true;
-boolean pickedFrom = false;
-boolean pickDest = false;
-boolean pickedDest = false;
+enum ReallocationState {
+   Initialize,
+   PickedFrom,
+   PickedDest
+}
+
+enum RetrievalState {
+   Initialize,
+   PickedRetrievalPos
+}
+
+enum StoringState {
+   Initialize,
+   PickedStoringPos
+}
+
+enum confirmationState {
+   Yes,
+   No,
+   Unknown 
+}
+
+ReallocationState realloc = ReallocationState.Initialize;
 
 void setup(){
   size(362, 562);
   cursor(HAND);
   strokeWeight(5);
+   
   gridBackground = loadImage("backgroundChess55.png");
   whiteCovering = loadImage("whiteImage.png");
   whiteCovering.resize(280, 100);
@@ -75,50 +95,47 @@ void draw(){
   withGrid = mouseWithinGrid();
   if(withGrid && mousePressed)
   {
-    if(pickFrom)
+    if(realloc == ReallocationState.Initialize)
     {
        updateFromRegion(mouseX, mouseY);
     }
-    else if(pickDest)
+    else if(realloc == ReallocationState.PickedFrom)
     {
       updateDestRegion(mouseX, mouseY);
     }
 
   }
-  else if(pickFrom)
+  else if(realloc == ReallocationState.Initialize)
   {
-      char states = clickedYes();
-      if(states == '1')
+      confirmationState confirm = clickedYes();
+      if(confirm == confirmationState.No)
       {
          clearEverything();
+         realloc = ReallocationState.Initialize;
          System.out.println("Please pick a position");
       }
-      else if(states == '2')
+      else if(confirm == confirmationState.Yes)
       {
          System.out.println("Now Choose the Destination");
-         pickFrom = false;
+         realloc = ReallocationState.PickedFrom;
          tint(255);
          image(whiteCovering, 35, 330);
-         pickDest = true;
       }
   }
-  else if(pickDest)
+  else if(realloc == ReallocationState.PickedFrom)
   {
-      char states = clickedYes();
-      if(states == '1')
+      confirmationState confirm = clickedYes();
+      if(confirm == confirmationState.No)
       {
          clearEverything();
+         realloc = ReallocationState.PickedFrom;
          gridCells[fromPosition[0]][fromPosition[1]].setToggleTrue();
          gridCells[fromPosition[0]][fromPosition[1]].updateCellVisual();
-         pickFrom = false;
-         pickedFrom = true;
-         pickDest = true;
          System.out.println("Please pick a position");
       }
-      else if(states == '2')
+      else if(confirm == confirmationState.Yes)
       {
-         pickedDest = true;
-         pickDest = false;
+         realloc = ReallocationState.PickedDest;
          tint(255);
          image(whiteCovering, 35, 330);
       }
@@ -136,15 +153,15 @@ boolean mouseWithinGrid(){
     return true;
 }
 
-char clickedYes()
+confirmationState clickedYes()
 {
   
     if(mousePressed && mouseX >= 250 && mouseX <= 315 && mouseY >= 380 && mouseY <= 405)
-      return '1';
+      return confirmationState.No;
     if(mousePressed && mouseX >= 45 && mouseX <= 105 && mouseY >= 380 && mouseY <= 405)
-      return '2';
+      return confirmationState.Yes;
       
-    return '0';
+    return confirmationState.Unknown;
 }
 
 public void clearEverything()
@@ -156,8 +173,6 @@ public void clearEverything()
     background(255);
     image(gridBackground, gridTL[0], gridTL[1]);
     tint(50);
-    pickedFrom = false;
-    pickFrom = true;
     
   }
   
