@@ -17,13 +17,14 @@ int[] gridTL = new int[2];
 int[] gridBR = new int[2];
 int[] gridSize = new int[2];
 
+int[] fromPosition= new int[2];
+int[] destPosition = new int[2];
 
-int[] mouseGridRegion = new int[2];
-int[] prevGridRegion = new int[2];
-//Gets modulo for mouse position in x and y coords
-int[] positionRounding = new int[2];
 boolean withGrid = false;
+boolean pickFrom = true;
 boolean pickedFrom = false;
+boolean pickDest = false;
+boolean pickedDest = false;
 
 void setup(){
   size(362, 562);
@@ -74,18 +75,50 @@ void draw(){
   withGrid = mouseWithinGrid();
   if(withGrid && mousePressed)
   {
-      updateCellRegion(mouseX, mouseY);
+    if(pickFrom)
+    {
+       updateFromRegion(mouseX, mouseY);
+    }
+    else if(pickDest)
+    {
+      updateDestRegion(mouseX, mouseY);
+    }
+
   }
-  else if(pickedFrom)
+  else if(pickFrom)
   {
       char states = clickedYes();
       if(states == '1')
       {
-        clearEverything();
+         clearEverything();
+         System.out.println("Please pick a position");
       }
       else if(states == '2')
       {
          System.out.println("Now Choose the Destination");
+         pickFrom = false;
+         tint(255);
+         image(whiteCovering, 35, 330);
+         pickDest = true;
+      }
+  }
+  else if(pickDest)
+  {
+      char states = clickedYes();
+      if(states == '1')
+      {
+         clearEverything();
+         gridCells[fromPosition[0]][fromPosition[1]].setToggleTrue();
+         gridCells[fromPosition[0]][fromPosition[1]].updateCellVisual();
+         pickFrom = false;
+         pickedFrom = true;
+         pickDest = true;
+         System.out.println("Please pick a position");
+      }
+      else if(states == '2')
+      {
+         pickedDest = true;
+         pickDest = false;
          tint(255);
          image(whiteCovering, 35, 330);
       }
@@ -114,7 +147,6 @@ char clickedYes()
     return '0';
 }
 
-
 public void clearEverything()
 {
     for(int rows = 0; rows < numCells[0]; rows++){
@@ -123,6 +155,9 @@ public void clearEverything()
     }
     background(255);
     image(gridBackground, gridTL[0], gridTL[1]);
+    tint(50);
+    pickedFrom = false;
+    pickFrom = true;
     
   }
   
@@ -147,10 +182,20 @@ public void createConfirmation()
 
 
 
-public void updateCellRegion(int x, int y){
+public void updateFromRegion(int x, int y){
     int indexRow = ((x-12) / 50) - 1;
     int indexCol = ((y-12) / 50) - 1;
-    gridCells[indexRow][indexCol].changeHoveringState();
+    fromPosition[0] = indexRow;
+    fromPosition[1] = indexCol;
+    gridCells[indexRow][indexCol].changeFromState();
     
+}
 
+public void updateDestRegion(int x, int y){
+    int indexRow = ((x-12) / 50) - 1;
+    int indexCol = ((y-12) / 50) - 1;
+    destPosition[0] = indexRow;
+    destPosition[1] = indexCol;
+    gridCells[indexRow][indexCol].changeDestState();
+  
 }
