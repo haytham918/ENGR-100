@@ -44,6 +44,8 @@ enum confirmationState {
 }
 
 ReallocationState realloc = ReallocationState.Initialize;
+RetrievalState retrieval = RetrievalState.Initialize;
+StoringState storing = StoringState.Initialize;
 
 void setup(){
   size(362, 562);
@@ -93,53 +95,7 @@ void draw(){
   
   stroke(204, 102, 0);
   withGrid = mouseWithinGrid();
-  if(withGrid && mousePressed)
-  {
-    if(realloc == ReallocationState.Initialize)
-    {
-       updateFromRegion(mouseX, mouseY);
-    }
-    else if(realloc == ReallocationState.PickedFrom)
-    {
-      updateDestRegion(mouseX, mouseY);
-    }
-
-  }
-  else if(realloc == ReallocationState.Initialize)
-  {
-      confirmationState confirm = clickedYes();
-      if(confirm == confirmationState.No)
-      {
-         clearEverything();
-         realloc = ReallocationState.Initialize;
-         System.out.println("Please pick a position");
-      }
-      else if(confirm == confirmationState.Yes)
-      {
-         System.out.println("Now Choose the Destination");
-         realloc = ReallocationState.PickedFrom;
-         tint(255);
-         image(whiteCovering, 35, 330);
-      }
-  }
-  else if(realloc == ReallocationState.PickedFrom)
-  {
-      confirmationState confirm = clickedYes();
-      if(confirm == confirmationState.No)
-      {
-         clearEverything();
-         realloc = ReallocationState.PickedFrom;
-         gridCells[fromPosition[0]][fromPosition[1]].setToggleTrue();
-         gridCells[fromPosition[0]][fromPosition[1]].updateCellVisual();
-         System.out.println("Please pick a position");
-      }
-      else if(confirm == confirmationState.Yes)
-      {
-         realloc = ReallocationState.PickedDest;
-         tint(255);
-         image(whiteCovering, 35, 330);
-      }
-  }
+  ReallocationMode();
   
   delay(80);
 }
@@ -213,4 +169,57 @@ public void updateDestRegion(int x, int y){
     destPosition[1] = indexCol;
     gridCells[indexRow][indexCol].changeDestState();
   
+}
+
+public void ReallocationMode()
+{
+
+if(withGrid && mousePressed)
+  {
+    if(realloc == ReallocationState.Initialize)
+    {
+       updateFromRegion(mouseX, mouseY);
+    }
+    else if(realloc == ReallocationState.PickedFrom)
+    {
+      updateDestRegion(mouseX, mouseY);
+    }
+
+  }
+  else if(realloc == ReallocationState.Initialize)
+  {
+      confirmationState confirm = clickedYes();
+      if(confirm == confirmationState.No)
+      {
+         clearEverything();
+         realloc = ReallocationState.Initialize;
+         System.out.println("Please pick a position");
+      }
+      else if(confirm == confirmationState.Yes)
+      {
+         System.out.println("Now Choose the Destination");
+         realloc = ReallocationState.PickedFrom;
+         tint(255);
+         image(whiteCovering, 35, 330);
+      }
+  }
+  else if(realloc == ReallocationState.PickedFrom)
+  {
+      confirmationState confirm = clickedYes();
+      if(confirm == confirmationState.No)
+      {
+         clearEverything();
+         realloc = ReallocationState.PickedFrom;
+         gridCells[fromPosition[0]][fromPosition[1]].setToggleTrue();
+         gridCells[fromPosition[0]][fromPosition[1]].updateCellVisual();
+         System.out.println("Please pick a position");
+      }
+      else if(confirm == confirmationState.Yes)
+      {
+         realloc = ReallocationState.PickedDest;
+         tint(255);
+         image(whiteCovering, 35, 330);
+      }
+  }
+
 }
