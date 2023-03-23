@@ -21,6 +21,14 @@ int[] fromPosition= new int[2];
 int[] destPosition = new int[2];
 
 boolean withGrid = false;
+
+enum ModeState{
+   Unknown,
+   Reallocation,
+   Retrieval,
+   Storing
+}
+
 enum ReallocationState {
    Initialize,
    PickedFrom,
@@ -46,6 +54,7 @@ enum confirmationState {
 ReallocationState realloc = ReallocationState.Initialize;
 RetrievalState retrieval = RetrievalState.Initialize;
 StoringState storing = StoringState.Initialize;
+ModeState mode = ModeState.Unknown;
 
 void setup(){
   size(362, 562);
@@ -83,6 +92,8 @@ void setup(){
   
   background(255);
   image(gridBackground, gridTL[0], gridTL[1]);
+  modeSelection();
+  fillOrigin();
   //infoPort = new Serial(this, "/dev/cu.usbmodem146301", 9600);
 }
 
@@ -95,7 +106,8 @@ void draw(){
   
   stroke(204, 102, 0);
   withGrid = mouseWithinGrid();
-  ReallocationMode();
+  if(mode == ModeState.Reallocation)
+     ReallocationMode();
   
   delay(80);
 }
@@ -139,7 +151,7 @@ public void createConfirmation()
     fill(85);
     textSize(23);
     text("Confirm the Position?", 85, 350);
-    fill(209, 208, 178);
+    fill(203, 208, 178);
     rect(45, 380, 60, 25);
     fill(209, 208, 178);
     rect(250, 380, 60, 25);
@@ -168,6 +180,33 @@ public void updateDestRegion(int x, int y){
     destPosition[0] = indexRow;
     destPosition[1] = indexCol;
     gridCells[indexRow][indexCol].changeDestState();
+  
+}
+
+public ModeState modeSelection(){
+    fill(55);
+    textSize(23);
+    text("Select the mode", 100, 350);
+    fill(235, 227, 174);
+    rect(30, 380, 90, 25);
+    fill(235, 227, 174);
+    rect(250, 380, 90, 25);
+    fill(235, 227, 174);
+    rect(140, 380, 90, 25);
+    fill(193, 11, 230);
+    textSize(15);
+    text("Reallocation", 36, 398);
+    text("Storing", 275, 398);
+    text("Retrieval", 158, 398);
+    return ModeState.Unknown;
+}
+
+public void fillOrigin()
+{
+   fill(255, 255, 255);
+   int originX = 52;
+   int originY = 258;
+   rect(originX, originY, 50, 50);
   
 }
 
@@ -221,5 +260,9 @@ if(withGrid && mousePressed)
          image(whiteCovering, 35, 330);
       }
   }
+}
 
+public void RetrievalMode()
+{
+  
 }
