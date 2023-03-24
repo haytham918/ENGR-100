@@ -3,7 +3,6 @@
 //Look into potential methods for interpreting ascii characters 
 //for 2 way serial connection.
 //DO NOT SHOEHORN INTO ASCII
-
 import processing.serial.*;
 Serial infoPort;
 //Reuse concepts from wirelessTest1 but make as image, not background
@@ -31,13 +30,41 @@ boolean uninitializedGridSelections = true;
 
 boolean transmittingData = false;
 boolean stage1ConfirmationRecieved = false;
+boolean resendOnTimer = false;
 
 int transmissionCounter = 0;
+
+byte[] message = new byte[10];
+
+byte[] exception = new byte[1];
+
+char[] confirmChars = new char[8];
 
 //NOTE, REMOVING FUNCTIONALITY OF TOGGLE AND PREVIOUS CELL
 void setup(){
   size(362, 562);
   gridBackground = loadImage("backgroundChess55.png");
+  exception[0] = 0x00;
+  
+  confirmChars[0] = 'a';
+  confirmChars[1] = 'c';
+  confirmChars[2] = 't';
+  confirmChars[3] = 'i';
+  confirmChars[4] = 'v';
+  confirmChars[5] = 'a';
+  confirmChars[6] = 't';
+  confirmChars[7] = 'e';
+  
+  message[0] = 0x30;
+  message[1] = 0x31;
+  message[2] = 0x32;
+  message[3] = 0x33;
+  message[4] = 0x34;
+  message[5] = 0x35;
+  message[6] = 0x36;
+  message[7] = 0x37;
+  message[8] = 0x38;
+  message[9] = 0x39;
   
   gridSize[0] = 260;
   gridSize[1] = 260;
@@ -191,14 +218,33 @@ void draw(){
   //Stage 1: Send data over to the arduino
     //transmittingData = false;
     stage1ConfirmationRecieved = false;
+    //Note, that in this stage, data is not being
+    //Inital message sent
+    sendMoveRequest(0);
+    println("request sent out for move data");
     while(!stage1ConfirmationRecieved){
-      while(infoPort.available() > 0){
       
+      //Timer to resend byte
+      if(!resendOnTimer){
+        //Want to create a timed function call that activates in 1 second
+        
+        //void sendMoveDataID = setTimeout(function(){
+        //  sendMoveRequest(0);
+        //  println("request sent out for move data");
+        //  resendOnTimer = false;
+        //  //Will be sent in 1 second
+        //}, 2000);
+        resendOnTimer = true;
+      }
       
+      //clearTimeout
+      if(infoPort.find(confirmChars[0]) == true){
+        stage1ConfirmationRecieved = true;
+        println("data transmission confirmed!!!!");
+        //clearTimeout(sendMoveDataID);
       }
     }
   }
-  
 }
 
 boolean mouseWithinGrid(){
@@ -216,4 +262,16 @@ public void updateCellClick(int x, int y){
 
 public void updateCellVisual(int x, int y){
   gridCells[x][y].updateCellVisual();
+}
+
+//Note, sends over the same 1-digit item.
+//Will be updated to vary based on previous position data 
+//and requested position to move to
+public void sendMoveRequest(int itemMarker){
+  if((itemMarker <= 9) && (itemMarker >= 0)){
+    infoPort.write(message[itemMarker]);
+  }else{
+    infoPort.write(exception[0]);
+    print("byte request out of bounds");
+  }
 }
