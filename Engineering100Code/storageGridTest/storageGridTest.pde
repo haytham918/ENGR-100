@@ -125,6 +125,7 @@ void draw(){
       }
     }
     
+    //Gets cell-region values for mouse location
     overGrid = mouseWithinGrid();
     
     if(mousePressed == true){
@@ -206,45 +207,46 @@ void draw(){
       println(")");
       println();
       
-      transmittingData = true;
-    }
-  } else {
-  //Data is being transmitted, would execute multiple loops of data sending
-  //and confirming to and from arduino and processing. Stages are as follows:
-    println();
-    println();
-    print("begin transmission:");
-    
-  //Stage 1: Send data over to the arduino
-    //transmittingData = false;
-    stage1ConfirmationRecieved = false;
-    //Note, that in this stage, data is not being
-    //Inital message sent
-    sendMoveRequest(0);
-    println("request sent out for move data");
-    while(!stage1ConfirmationRecieved){
-      
-      //Timer to resend byte
-      if(!resendOnTimer){
-        //Want to create a timed function call that activates in 1 second
-        
-        //void sendMoveDataID = setTimeout(function(){
-        //  sendMoveRequest(0);
-        //  println("request sent out for move data");
-        //  resendOnTimer = false;
-        //  //Will be sent in 1 second
-        //}, 2000);
-        resendOnTimer = true;
-      }
-      
-      //clearTimeout
-      if(infoPort.find(confirmChars[0]) == true){
-        stage1ConfirmationRecieved = true;
-        println("data transmission confirmed!!!!");
-        //clearTimeout(sendMoveDataID);
-      }
+      //transmittingData = true;
     }
   }
+  //} else {
+  ////Data is being transmitted, would execute multiple loops of data sending
+  ////and confirming to and from arduino and processing. Stages are as follows:
+  //  println();
+  //  println();
+  //  print("begin transmission:");
+    
+  ////Stage 1: Send data over to the arduino
+  //  //transmittingData = false;
+  //  stage1ConfirmationRecieved = false;
+  //  //Note, that in this stage, data is not being
+  //  //Inital message sent
+  //  sendMoveRequest(0);
+  //  println("request sent out for move data");
+  //  while(!stage1ConfirmationRecieved){
+      
+  //    //Timer to resend byte
+  //    if(!resendOnTimer){
+  //      //Want to create a timed function call that activates in 1 second
+        
+  //      //void sendMoveDataID = setTimeout(function(){
+  //      //  sendMoveRequest(0);
+  //      //  println("request sent out for move data");
+  //      //  resendOnTimer = false;
+  //      //  //Will be sent in 1 second
+  //      //}, 2000);
+  //      resendOnTimer = true;
+  //    }
+      
+  //    //clearTimeout
+  //    if(infoPort.find(confirmChars[0]) == true){
+  //      stage1ConfirmationRecieved = true;
+  //      println("data transmission confirmed!!!!");
+  //      //clearTimeout(sendMoveDataID);
+  //    }
+  //  }
+  //}
 }
 
 boolean mouseWithinGrid(){
