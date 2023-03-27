@@ -89,7 +89,6 @@ public class StorageCell{
     else 
     {
        System.out.println("Please select another position");
-
     }
   }
  
