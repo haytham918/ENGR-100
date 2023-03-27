@@ -63,7 +63,7 @@ void setup(){
    
   gridBackground = loadImage("backgroundChess55.png");
   whiteCovering = loadImage("whiteImage.png");
-  whiteCovering.resize(280, 100);
+  whiteCovering.resize(450, 200);
   gridSize[0] = 262;
   gridSize[1] = 262;
   
@@ -92,8 +92,6 @@ void setup(){
   
   background(255);
   image(gridBackground, gridTL[0], gridTL[1]);
-  modeSelection();
-  fillOrigin();
   //infoPort = new Serial(this, "/dev/cu.usbmodem146301", 9600);
 }
 
@@ -101,14 +99,19 @@ void draw(){
 
   //Updates 10 times a second
   //frameRate(10);
-  
+   if(mode == ModeState.Unknown)
+   {
+     mode = modeSelection();
+   }
   //Make condition for when mouse is outside grid...
-  
   stroke(204, 102, 0);
   withGrid = mouseWithinGrid();
   if(mode == ModeState.Reallocation)
      ReallocationMode();
-  
+  if(mode == ModeState.Retrieval)
+    RetrievalMode();
+  if(mode == ModeState.Storing)
+    StoringMode();
   delay(80);
 }
 
@@ -148,6 +151,8 @@ public void clearEverything()
 
 public void createConfirmation()
 {
+    tint(255);
+    image(whiteCovering, 10, 330);
     fill(85);
     textSize(23);
     text("Confirm the Position?", 85, 350);
@@ -184,20 +189,50 @@ public void updateDestRegion(int x, int y){
 }
 
 public ModeState modeSelection(){
-    fill(55);
-    textSize(23);
-    text("Select the mode", 100, 350);
+    fill(70,70,70);
+    textSize(21);
+    text("Select the mode", 110, 360);
     fill(235, 227, 174);
-    rect(30, 380, 90, 25);
+    rect(30, 420, 90, 25);
     fill(235, 227, 174);
-    rect(250, 380, 90, 25);
+    rect(250, 420, 90, 25);
     fill(235, 227, 174);
-    rect(140, 380, 90, 25);
-    fill(193, 11, 230);
+    rect(140, 420, 90, 25);
+    fill(43, 123, 168);
     textSize(15);
-    text("Reallocation", 36, 398);
-    text("Storing", 275, 398);
-    text("Retrieval", 158, 398);
+    text("Reallocation", 36, 438);
+    text("Storing", 275, 438);
+    text("Retrieval", 158, 438);
+    
+    if(mousePressed && mouseX >= 30 && mouseX <= 120 && mouseY >= 420 && mouseY <= 445)
+    {
+       System.out.println("Reallocation Mode Selected");
+        tint(255);
+        image(whiteCovering, 10, 330);
+        fill(70,70,70);
+        textSize(23);
+        text("Pick From Position", 95, 350);
+       return ModeState.Reallocation;
+    }
+    if(mousePressed && mouseX >= 140 && mouseX <= 230 && mouseY >= 420 && mouseY <= 445)
+    {
+       System.out.println("Retrieval Mode Selected");
+      background(255);
+      image(gridBackground, gridTL[0], gridTL[1]);
+      tint(50);
+       fillOrigin();
+       return ModeState.Retrieval;
+    }
+    if(mousePressed && mouseX >= 250 && mouseX <= 340 && mouseY >= 420 && mouseY <= 445)
+    {
+      
+       System.out.println("Storing Mode Selected");
+       background(255);
+      image(gridBackground, gridTL[0], gridTL[1]);
+      tint(50);
+       fillOrigin();
+       return ModeState.Storing;
+    }
     return ModeState.Unknown;
 }
 
@@ -230,16 +265,21 @@ if(withGrid && mousePressed)
       confirmationState confirm = clickedYes();
       if(confirm == confirmationState.No)
       {
-         clearEverything();
-         realloc = ReallocationState.Initialize;
-         System.out.println("Please pick a position");
+        clearEverything();
+        realloc = ReallocationState.Initialize;
+        fill(70,70,70);
+        textSize(23);
+        text("Pick From Position", 95, 350);
       }
       else if(confirm == confirmationState.Yes)
       {
          System.out.println("Now Choose the Destination");
          realloc = ReallocationState.PickedFrom;
          tint(255);
-         image(whiteCovering, 35, 330);
+         image(whiteCovering, 10, 330);
+         fill(70,70,70);
+         textSize(23);
+         text("Pick Destination Position", 65, 350);
       }
   }
   else if(realloc == ReallocationState.PickedFrom)
@@ -251,7 +291,9 @@ if(withGrid && mousePressed)
          realloc = ReallocationState.PickedFrom;
          gridCells[fromPosition[0]][fromPosition[1]].setToggleTrue();
          gridCells[fromPosition[0]][fromPosition[1]].updateCellVisual();
-         System.out.println("Please pick a position");
+         fill(70,70,70);
+         textSize(23);
+         text("Pick Destination Position", 65, 350);
       }
       else if(confirm == confirmationState.Yes)
       {
@@ -264,5 +306,11 @@ if(withGrid && mousePressed)
 
 public void RetrievalMode()
 {
+  
+}
+
+public void StoringMode()
+{
+  
   
 }
