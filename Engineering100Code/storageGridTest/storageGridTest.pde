@@ -206,7 +206,7 @@ void draw(){
       print(currentClickedCell[1]);
       println(")");
       println();
-      
+      delay(100);
       //transmittingData = true;
     }
   }
