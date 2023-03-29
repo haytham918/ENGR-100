@@ -107,11 +107,17 @@ void draw(){
   stroke(204, 102, 0);
   withGrid = mouseWithinGrid();
   if(mode == ModeState.Reallocation)
+  {
      ReallocationMode();
+  }
   if(mode == ModeState.Retrieval)
+  {
     RetrievalMode();
+  }
   if(mode == ModeState.Storing)
+  {
     StoringMode();
+  }
   delay(80);
 }
 
@@ -221,6 +227,9 @@ public ModeState modeSelection(){
       image(gridBackground, gridTL[0], gridTL[1]);
       tint(50);
        fillOrigin();
+       fill(70,70,70);
+        textSize(23);
+        text("Pick Retrieval Position", 80, 350);
        return ModeState.Retrieval;
     }
     if(mousePressed && mouseX >= 250 && mouseX <= 340 && mouseY >= 420 && mouseY <= 445)
@@ -231,6 +240,9 @@ public ModeState modeSelection(){
       image(gridBackground, gridTL[0], gridTL[1]);
       tint(50);
        fillOrigin();
+        fill(70,70,70);
+        textSize(23);
+        text("Pick Storing Position", 85, 350);
        return ModeState.Storing;
     }
     return ModeState.Unknown;
@@ -242,6 +254,7 @@ public void fillOrigin()
    int originX = 52;
    int originY = 258;
    rect(originX, originY, 50, 50);
+   gridCells[0][4].setToggleTrue();
   
 }
 
@@ -306,11 +319,60 @@ if(withGrid && mousePressed)
 
 public void RetrievalMode()
 {
-  
+  if(withGrid && mousePressed)
+  {
+     if(retrieval == RetrievalState.Initialize)
+     {
+        updateDestRegion(mouseX, mouseY);
+     }
+  }
+  else if(retrieval == RetrievalState.Initialize)
+  {
+      confirmationState confirm = clickedYes();
+      if(confirm == confirmationState.No)
+      {
+        clearEverything();
+        fill(70,70,70);
+        textSize(23);
+        text("Pick Retrieval Position", 80, 350);
+        fillOrigin();
+      }
+      else if(confirm == confirmationState.Yes)
+      {
+         
+         retrieval = RetrievalState.PickedRetrievalPos;
+         tint(255);
+         image(whiteCovering, 10, 330);
+      }
+  }
 }
 
 public void StoringMode()
 {
-  
+  if(withGrid && mousePressed)
+  {
+     if(storing == StoringState.Initialize)
+     {
+        updateFromRegion(mouseX, mouseY);
+     }
+  }
+  else if(storing == StoringState.Initialize)
+  {
+      confirmationState confirm = clickedYes();
+      if(confirm == confirmationState.No)
+      {
+        clearEverything();
+        fill(70,70,70);
+        textSize(23);
+        text("Pick Storing Position", 85, 350);
+        fillOrigin();
+      }
+      else if(confirm == confirmationState.Yes)
+      {
+         storing = StoringState.PickedStoringPos;
+         tint(255);
+         image(whiteCovering, 10, 330);
+      }
+  }
   
 }
