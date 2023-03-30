@@ -31,17 +31,21 @@ enum ModeState{
 
 enum ReallocationState {
    Initialize,
+   PickFromNotConfirm,
    PickedFrom,
+   PickDestNotConfirm,
    PickedDest
 }
 
 enum RetrievalState {
    Initialize,
+   PickNotConfirm,
    PickedRetrievalPos
 }
 
 enum StoringState {
    Initialize,
+   PickNotConfirm,
    PickedStoringPos
 }
 
@@ -266,14 +270,16 @@ if(withGrid && mousePressed)
     if(realloc == ReallocationState.Initialize)
     {
        updateFromRegion(mouseX, mouseY);
+       realloc = ReallocationState.PickFromNotConfirm;
     }
     else if(realloc == ReallocationState.PickedFrom)
     {
       updateDestRegion(mouseX, mouseY);
+      realloc = ReallocationState.PickDestNotConfirm;
     }
 
   }
-  else if(realloc == ReallocationState.Initialize)
+  else if(realloc == ReallocationState.PickFromNotConfirm)
   {
       confirmationState confirm = clickedYes();
       if(confirm == confirmationState.No)
@@ -295,7 +301,7 @@ if(withGrid && mousePressed)
          text("Pick Destination Position", 65, 350);
       }
   }
-  else if(realloc == ReallocationState.PickedFrom)
+  else if(realloc == ReallocationState.PickDestNotConfirm)
   {
       confirmationState confirm = clickedYes();
       if(confirm == confirmationState.No)
@@ -324,9 +330,10 @@ public void RetrievalMode()
      if(retrieval == RetrievalState.Initialize)
      {
         updateDestRegion(mouseX, mouseY);
+        retrieval = RetrievalState.PickNotConfirm;
      }
   }
-  else if(retrieval == RetrievalState.Initialize)
+  else if(retrieval == RetrievalState.PickNotConfirm)
   {
       confirmationState confirm = clickedYes();
       if(confirm == confirmationState.No)
@@ -336,6 +343,7 @@ public void RetrievalMode()
         textSize(23);
         text("Pick Retrieval Position", 80, 350);
         fillOrigin();
+        retrieval = RetrievalState.Initialize;
       }
       else if(confirm == confirmationState.Yes)
       {
@@ -354,9 +362,10 @@ public void StoringMode()
      if(storing == StoringState.Initialize)
      {
         updateFromRegion(mouseX, mouseY);
+        storing = StoringState.PickNotConfirm;
      }
   }
-  else if(storing == StoringState.Initialize)
+  else if(storing == StoringState.PickNotConfirm)
   {
       confirmationState confirm = clickedYes();
       if(confirm == confirmationState.No)
@@ -366,6 +375,7 @@ public void StoringMode()
         textSize(23);
         text("Pick Storing Position", 85, 350);
         fillOrigin();
+        storing = StoringState.Initialize;
       }
       else if(confirm == confirmationState.Yes)
       {
