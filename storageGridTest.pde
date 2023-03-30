@@ -7,26 +7,52 @@
 import processing.serial.*;
 Serial infoPort;
 //Reuse concepts from wirelessTest1 but make as image, not background
-PImage bground;
+
+
+enum ModeState{
+   Unknown,
+   Reallocation,
+   Retrieval,
+   Storing
+}
+
+enum ReallocationState {
+   Initialize,
+   PickedFrom,
+   PickedDest
+}
+
+enum RetrievalState {
+   Initialize,
+   PickedRetrievalPos
+}
+
+enum StoringState {
+   Initialize,
+   PickedStoringPos
+}
+
+enum confirmationState {
+   Yes,
+   No,
+   Unknown 
+}
 
 StorageCellGrid s = new StorageCellGrid();
 
-int[] mouseGridRegion = new int[2];
-//Gets modulo for mouse position in x and y coords
-int[] positionRounding = new int[2];
-boolean overGrid = false;
 
-
-
+void settings() {
+  size(s.get_GUIsize()[0], s.get_GUIsize()[1]);
+}
 void setup(){
-  size(362, 562);
-  noCursor();
+  cursor(HAND);
   strokeWeight(5);
-  bground = loadImage("backgroundChess55.png");
+  //PImage bground = loadImage(s.get_image());
   s.init_grid_cells();
-  bground.resize(s.get_grid_size()[0],s.get_grid_size()[1]);
-  background(255);
-  image(bground, s.get_gTopLeft_coords()[0], s.get_gTopLeft_coords()[1]);
+  //bground.resize(s.get_grid_size()[0],s.get_grid_size()[1]);
+  s.clearEverything();
+  //background(255);
+  //image(s.get_pimage(), s.get_gTopLeft_coords()[0], s.get_gTopLeft_coords()[1]);
   //infoPort = new Serial(this, "/dev/cu.usbmodem146301", 9600);
 }
 
@@ -35,46 +61,11 @@ void draw(){
   //frameRate(10);
   
   //Make condition f
-  print(s.get_prevGridReg()[0]);
-  print(s.get_prevGridReg()[1]);
+  //Updates 10 times a second
+  //frameRate(10);
   
-  overGrid = s.mouseWithinGrid();
-  if(overGrid){
-    
-    //Update current coordinate position.
-    positionRounding[0] = mouseX % 50;
-    positionRounding[1] = mouseY % 50;
-    
-    mouseGridRegion[0] = (mouseX - positionRounding[0] - 50)/50;
-    mouseGridRegion[1] = (mouseY - positionRounding[1] - 50)/50;
-    
-    //First ensure that pointer was not in same position
-    //Either x or y coord must be different
-    if((s.get_prevGridReg()[0] != mouseGridRegion[0]) || (s.get_prevGridReg()[1] != mouseGridRegion[1])){
-      s.updateCellRegion(mouseGridRegion[0], mouseGridRegion[1]);
-      
-      //To ensure neither x or y of prev region are outside bounds
-      if((s.get_prevGridReg()[0] != -1) && (s.get_prevGridReg()[1] != -1)){
-        s.updateCellRegion(s.get_prevGridReg()[0], s.get_prevGridReg()[1]);
-      }
-    }
-    
-    
-    //Update previous grid region to now be current grid region (for next loop)
-    s.get_prevGridReg()[0] = mouseGridRegion[0];
-    s.get_prevGridReg()[1] = mouseGridRegion[1];
-    
-  } else {
-    mouseGridRegion[0] = -1;
-    mouseGridRegion[1] = -1;
-    
-    if((s.get_prevGridReg()[0 ] != -1) && (s.get_prevGridReg()[1] != -1)){
-      s.updateCellRegion(s.get_prevGridReg()[0], s.get_prevGridReg()[1]);
-      s.get_prevGridReg()[0] = -1;
-      s.get_prevGridReg()[1] = -1;
-    }
-    //Set prevGridRegion to -1 -1 as well.
-  }
-  //rect((mouseGridRegion[0]+1)*50, (mouseGridRegion[1]+1)*50, 50, 50)
-  delay(100);
+  //Make condition for when mouse is outside grid...
+  
+  stroke(204, 102, 0);
+  s.runSimulation();
 }
