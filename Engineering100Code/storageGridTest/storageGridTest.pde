@@ -180,22 +180,23 @@ public void createConfirmation()
 
 
 
-public void updateFromRegion(int x, int y){
+public boolean updateFromRegion(int x, int y){
     int indexRow = ((x-12) / 50) - 1;
     int indexCol = ((y-12) / 50) - 1;
     fromPosition[0] = indexRow;
     fromPosition[1] = indexCol;
-    gridCells[indexRow][indexCol].changeFromState();
+    boolean success = gridCells[indexRow][indexCol].changeFromState();
+    return success;
     
 }
 
-public void updateDestRegion(int x, int y){
+public boolean updateDestRegion(int x, int y){
     int indexRow = ((x-12) / 50) - 1;
     int indexCol = ((y-12) / 50) - 1;
     destPosition[0] = indexRow;
     destPosition[1] = indexCol;
-    gridCells[indexRow][indexCol].changeDestState();
-  
+    boolean success = gridCells[indexRow][indexCol].changeDestState();
+    return success;
 }
 
 public ModeState modeSelection(){
@@ -267,15 +268,18 @@ public void ReallocationMode()
 
 if(withGrid && mousePressed)
   {
+    boolean result;
     if(realloc == ReallocationState.Initialize)
     {
-       updateFromRegion(mouseX, mouseY);
-       realloc = ReallocationState.PickFromNotConfirm;
+       result = updateFromRegion(mouseX, mouseY);
+       if(result)
+         realloc = ReallocationState.PickFromNotConfirm;
     }
     else if(realloc == ReallocationState.PickedFrom)
     {
-      updateDestRegion(mouseX, mouseY);
-      realloc = ReallocationState.PickDestNotConfirm;
+      result = updateDestRegion(mouseX, mouseY);
+      if(result)
+        realloc = ReallocationState.PickDestNotConfirm;
     }
 
   }
@@ -329,8 +333,9 @@ public void RetrievalMode()
   {
      if(retrieval == RetrievalState.Initialize)
      {
-        updateDestRegion(mouseX, mouseY);
-        retrieval = RetrievalState.PickNotConfirm;
+        boolean result = updateDestRegion(mouseX, mouseY);
+        if(result)
+          retrieval = RetrievalState.PickNotConfirm;
      }
   }
   else if(retrieval == RetrievalState.PickNotConfirm)
@@ -361,8 +366,9 @@ public void StoringMode()
   {
      if(storing == StoringState.Initialize)
      {
-        updateFromRegion(mouseX, mouseY);
-        storing = StoringState.PickNotConfirm;
+        boolean result = updateFromRegion(mouseX, mouseY);
+        if(result)
+          storing = StoringState.PickNotConfirm;
      }
   }
   else if(storing == StoringState.PickNotConfirm)

@@ -58,7 +58,7 @@ public class StorageCell{
     selectionToggle = true;
   }
   
-  public void changeFromState(){
+  public boolean changeFromState(){
     if(!selectionToggle)
     {
        selectionToggle = true;
@@ -67,15 +67,17 @@ public class StorageCell{
        selectionColor[2] = 120;
        updateCellVisual();
        createConfirmation();
+       return true;
     }
     else 
     {
        System.out.println("Please select another position");
+       return false;
 
     }
   }
   
-  public void changeDestState()
+  public boolean changeDestState()
   {
       if(!selectionToggle)
     {
@@ -85,10 +87,12 @@ public class StorageCell{
        selectionColor[2] = 110;
        updateCellVisual();
        createConfirmation();
+       return true;
     }
     else 
     {
        System.out.println("Please select another position");
+       return false;
     }
   }
  
