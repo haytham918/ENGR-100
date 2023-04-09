@@ -340,4 +340,5 @@ public void response_matches_expected(){
   }
   println("equal to " + response_expected_string);
   println();
+  infoPort.clear();
 }

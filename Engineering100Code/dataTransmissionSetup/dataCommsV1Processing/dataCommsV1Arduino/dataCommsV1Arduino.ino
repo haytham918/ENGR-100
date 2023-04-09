@@ -1,14 +1,21 @@
-//OP states:
-//New_message_processing;
-//If on, 
+#include <string.h>
 
+void notify_state(boolean isOpenForData);
+boolean length_matches_command_format(char command_type, int end_index);
+bool command_suitable_for_mode(char recieved_char);
+void process_message_step(char recieved_char);
+void corrupt_message_clear();
 
+boolean is_idle;
+boolean is_action_modifying;
 
 boolean new_message_processing;
+boolean corrupted_message;
+boolean completed_message;
 
 const int max_message_length = 32;
 char message_recieved_char[max_message_length];
-int message_recived_counter = 0;
+int message_recieved_counter;
 
 char response_sent[max_message_length];
 String response_string;
@@ -16,10 +23,11 @@ String response_string;
 char special_chars[8];
 char recieved_char;
 
-void notify_state(boolean isOpenForData);
+const char allowed_idle_id_chars[6] = {'S', 'P', 'R', 'C', 'G', 'A'};
+const char allowed_active_id_chars[2] = {'E', 'A'};
+  
 
-void setup()
-{
+void setup(){
 	// Declare pins as Outputs
   Serial.begin(9600);
   special_chars[0] = (char)(2); //Start of Text
@@ -32,74 +40,49 @@ void setup()
   special_chars[7] = (char)(24); //Cancel by saying data is is error 
   //or otherwise should be disregarded
   
-  //Start off buffer storage empty and no messages read
-  //Any residual data from previous operations is removed
   Serial.flush();
   new_message_processing = false;
+  corrupted_message = false;
+  is_idle = true;
+  completed_message = false;
+  is_action_modifying = false;
+  message_recieved_counter = 0;
+  
 }
 
 void loop()
 {
     if(Serial.available() > 0){
       recieved_char = Serial.read();
-    }
+      process_message_step(recieved_char);
+      
+      if(completed_message){
 
-    if
-  
-//  //Clear the buffer and notify computer that it is
-//  //primed to recieve new messages
-//  notify_state(true);
-//  Serial.flush();
-//  
-//  //Reset state to look for a new message
-//  new_message_processing = false;
-//  message_recived_counter = 0;
-//
-//  //While a new message has not been found,
-//  //scan for incoming data
-//  while(!new_message_processing){
-//    if(Serial.available() > 0){
-//      message_recived_counter++;
-//      //Assuming that first char sent is STX
-//      //For start of transmission
-//      char new_byte = Serial.read();
-//
-//      //For now, assume the message_recieved counter is less than 32
-//      //Since if it is equal or greater than 32, it would be storing to
-//      //Out of bounds index in array
-//      message_recieved_char[message_recived_counter-1] = new_byte;
-//      //If ETX found, stop reading new data
-//      if(new_byte == special_chars[1]){
-//        new_message_processing = true;
-//      }
-//    }
-//  }
-//  //At this point, the full message sent over, including '\0'
-//
-//  //Notify computer that it is
-//  //closed off to new messages
-//  notify_state(true);
-//  
-//  //Wait a small amount of time before clearning buffer
-//  delay(15);
-//  Serial.flush();
-//
-//  //Go through all items in the array and modify them to shift up 1
-//  //If special char found, do not modify
-//  for(int index = 0; index < message_recived_counter; index++){
-//    if(message_recieved_char[index] == special_chars[0]){
-//      //Do not modify STX
-//      response_sent[index] = message_recieved_char[index];
-//    } else if (message_recieved_char[index] == special_chars[0]){
-//      //Do not modify ETX
-//      response_sent[index] = message_recieved_char[index];
-//    } else {
-//      response_sent[index] = (char)(message_recieved_char[index] + 1);
-//    }
-//  }
-//
-//  Serial.println(response_string);
+        if(is_idle){
+          
+        }
 
+        if(is_action_modifying){
+
+          
+        }
+        //After the last character is recieved and added to the character
+        //array, the command is complete and the system is no longer idle.
+        //So, before the system starts moving, the calculation steps must take place
+
+
+        //If system is already not idle, execute the command,
+        //and modify it's operation to match the command.
+        
+        //At the end of this phase, turn completed_message off
+      }
+     
+   }
+
+   //Modify in some way based on the command given.
+   if(!is_idle && !new_message_processing){
+      //here is where we do the steps for physical gantry motion
+   }
 }
 
 void notify_state(boolean isOpenForData){
@@ -118,3 +101,131 @@ void notify_state(boolean isOpenForData){
   
   Serial.println(state_message);
 }
+
+boolean length_matches_command_format(char command_type, int end_index){
+  int len_array = end_index+1;
+  
+  if((command_type == 'A') && (len_array == 3)){
+    return true;
+  } else if((command_type == 'E') && (len_array == 3)){
+    return true;
+  } else if((command_type == 'R') && ((len_array == 8) || (len_array == 20))){
+    return true;
+  } else if((command_type == 'P') && (len_array == 20)){
+    return true;
+  } else if((command_type == 'S') && (len_array == 8)){
+    return true;
+  } else if((command_type == 'C') && (len_array == 3)){
+    return true;
+  } else if((command_type == 'G') && (len_array == 3)){
+    return true;
+  } else {
+    return false;
+  }
+
+  
+}
+
+bool command_suitable_for_mode(char recieved_char){
+  //If not suitable, the message is corrupted.
+  
+  if(is_idle){
+    //Idle mode can be 'S', 'P', 'R', 'C', 'G', 'A'
+    //Aka if the recieved character is not in the array of allowed chars
+    
+    if (strpbrk(allowed_idle_id_chars, recieved_char) == 0){
+      return false;
+    } else {
+      return true;
+    }
+    
+  } else {
+    //Active mode can be 'E', 'A'
+    //Aka if the recieved character is not in the array of allowed chars
+    
+    if (strpbrk(allowed_active_id_chars, recieved_char) == 0){
+      return false;
+    } else {
+      return true;
+    }
+    
+  }
+  
+}
+
+void process_message_step(char recieved_char){
+      //If character is STX
+    if(recieved_char == special_chars[0]){
+
+      //If message has not started yet
+      if(!new_message_processing){
+        message_recieved_char[message_recieved_counter] = recieved_char;
+        message_recieved_counter = 0;
+        new_message_processing = true;
+        corrupted_message = false;
+        
+      } else {
+        //If STX appears and the sequence has already started,
+        //It is corrupted.
+        corrupted_message = true;
+        
+      }
+    } else if(!corrupted_message){
+      //If the message has started and it is not corrupted
+      message_recieved_counter++;
+      message_recieved_char[message_recieved_counter] = recieved_char;
+
+      //If is the second character, it is command type
+      if(message_recieved_counter == 1){
+        //Check all types of possible messages
+        //and declare corrupted if not suitable
+        //So first differentiate by OPmode
+        if(!command_suitable_for_mode(recieved_char)){
+          //If the command is unsuitable, then the command is corrupted.
+          corrupted_message = true;
+        }
+        
+      }else{
+        //If already passed 2nd character and ETX is found,
+        //compare the lengths to the expected lengths of the
+        //type of command it is.
+        if(recieved_char == special_chars[1]){
+          if(length_matches_command_format(recieved_char, message_recieved_counter)){
+            //If gotten to this point, then the program should begin to run
+            //and move the gantry.
+            if(is_idle){
+              is_idle = false;
+            } else {
+              is_action_modifying = true;
+            }
+            
+            new_message_processing = false;
+          } else {
+            //If the length is wrong, then the command is corrupted.
+            corrupted_message = true;
+          }
+        }
+      }
+    }
+
+    if(corrupted_message && new_message_processing){
+      corrupt_message_clear();
+    }
+}
+
+void corrupt_message_clear(){
+    //The message is corrupted, so clear it.
+    //Declare that a new message is not being processed
+    //Declare that the current message has been found to be
+    //corrupted.
+
+    //Note that corrupted messages
+    //also cover commands given in unsuitable OP states.
+    message_recieved_counter = 0;
+    new_message_processing = false;
+    memset( message_recieved_char, '\0' , max_message_length );
+}
+
+//Need function for origin return
+
+//Need function for calculating
