@@ -41,6 +41,11 @@ String response_given_string;
 boolean response_accurate = true;
 int response_counter = -1;
 
+int[][] occupancy_grid;
+
+
+
+
 void setup(){
   size(362, 562);
   
@@ -90,6 +95,8 @@ void setup(){
   special_chars[7] = (char)(24); //Cancel by saying data is is error 
   //or otherwise should be disregarded
   infoPort = new Serial(this, "/dev/cu.usbmodem146301", 9600);
+  
+  occupancy_grid = new int[numCells[0]][numCells[1]];
 }
 
 void draw(){
@@ -341,4 +348,66 @@ public void response_matches_expected(){
   println("equal to " + response_expected_string);
   println();
   infoPort.clear();
+}
+
+
+//Only use after confirming that the first three chars
+//are good: 'STX' 'G' 'ACK'
+//Will parse through incoming data from serial and add it to occupancy state.
+//If the data is bad, it will let the arduino know and rerequest the data
+//If the data is good, it will proceed.
+//The function internally checks if the length, datatype, and ending char
+//of the message is correct.
+
+public void recieve_grid_occ_data(){
+  boolean read_final = false;
+  boolean is_corrupted = false;
+  int counter_items = -1;
+  int counter_rows = -1;
+  int counter_rem = 0;
+  int new_val;
+  char read_char;
+
+  while((counter_rows < numCells[0]) && (!is_corrupted)){
+    if(infoPort.available() > 0){
+      counter_items++;
+      counter_rem = counter_items % numCells[1];
+      
+      if(counter_rem == 0){
+        counter_rows++;
+      }
+      if(counter_rows >= numCells[0]){
+        break;
+      } else {
+        new_val = infoPort.read();
+        //Need to check if recieved data falls within expected value.
+        //If the data is not an expected value, it is corrupted.
+        //Could be conversion errors based on how Serial is sending data over.
+        occupancy_grid[counter_rows][counter_rem] = new_val;
+      }
+    }
+  }
+  
+  if(!is_corrupted){
+    do{
+      if(infoPort.available() > 0){
+        new_val = infoPort.read();
+        read_char = (char)(new_val);
+        read_final = true;
+        
+        if(read_char != special_chars[1]){
+          is_corrupted = true;
+        }else{
+          //message_rec_conf() to let arduino know it is ready for more info
+          println("data collected, not corrupted.");
+        }
+      }
+    } while(!read_final);
+  }
+  
+  if(is_corrupted){
+    //message_corrupt_clear();
+    //message_rerequest_send() to let arduino know data was corrupted
+    println("data not collected, is corrupted.");
+  }
 }

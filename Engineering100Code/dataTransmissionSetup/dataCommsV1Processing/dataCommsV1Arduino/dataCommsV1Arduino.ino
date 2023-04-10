@@ -1,14 +1,28 @@
 #include <string.h>
+#include <stdint.h>
 
-void notify_state(boolean isOpenForData);
-boolean length_matches_command_format(char command_type, int end_index);
-bool command_suitable_for_mode(char recieved_char);
-void process_message_step(char recieved_char);
-void corrupt_message_clear();
+const int rows = 5;
+const int cols = 5;
+const int row_scale = 8; //Scale to be num of revs per cell vertically
+const int col_scale = 8; //Scale to be num of revs per cell horizontally
+
+//When transmitting numbers over serial, need to add 64 to vals to prevent
+//confusion with control chars. Thus, store as uint8_t, 
+//and add 64 later to convert
+
+//int = 1 is open
+//int = 2 is closed
+//If int > 2, then changed state
+//int = 3 is changed to open
+//int = 4 is changed to closed
+uint8_t cell_status[rows][cols];
+
+int num_cells = rows*cols;
+const int max_name_length = 16;
+char[num_cells][max_name_length];
+
 
 boolean is_idle;
-boolean is_action_modifying;
-
 boolean new_message_processing;
 boolean corrupted_message;
 boolean completed_message;
@@ -25,7 +39,28 @@ char recieved_char;
 
 const char allowed_idle_id_chars[6] = {'S', 'P', 'R', 'C', 'G', 'A'};
 const char allowed_active_id_chars[2] = {'E', 'A'};
-  
+
+//S is swap
+//P is place
+//R is retrieve
+//C is cell changes (manual)
+//G is grid state
+//A is operation state
+//E is emergency stop
+
+char action_type;
+
+
+
+
+void notify_state(boolean isOpenForData);
+boolean length_matches_command_format(char command_type, int end_index);
+bool command_suitable_for_mode(char recieved_char);
+void process_message_step(char recieved_char);
+void corrupt_message_clear();
+void setup_starting_command(char action);
+void op_state_query(); //'A' command
+
 
 void setup(){
 	// Declare pins as Outputs
@@ -45,7 +80,7 @@ void setup(){
   corrupted_message = false;
   is_idle = true;
   completed_message = false;
-  is_action_modifying = false;
+  //is_action_modifying = false;
   message_recieved_counter = 0;
   
 }
@@ -58,23 +93,17 @@ void loop()
       
       if(completed_message){
 
-        if(is_idle){
-          
-        }
-
-        if(is_action_modifying){
-
-          
-        }
-        //After the last character is recieved and added to the character
-        //array, the command is complete and the system is no longer idle.
-        //So, before the system starts moving, the calculation steps must take place
-
-
-        //If system is already not idle, execute the command,
-        //and modify it's operation to match the command.
+        action_type =  message_recieved_char[1];
+        
+        //Calculation steps occur now.
+        //Since we already know if the command is suitable for the mode
+        //and that the command length is appropriate, 
+        //we can execute the command directly via a function.
         
         //At the end of this phase, turn completed_message off
+        //We also reset the counter for message recieved, 
+        //clear the array itself after data transplanting
+        //and so on.
       }
      
    }
@@ -84,6 +113,8 @@ void loop()
       //here is where we do the steps for physical gantry motion
    }
 }
+
+
 
 void notify_state(boolean isOpenForData){
   char state_message[5]; 
@@ -101,6 +132,8 @@ void notify_state(boolean isOpenForData){
   
   Serial.println(state_message);
 }
+
+
 
 boolean length_matches_command_format(char command_type, int end_index){
   int len_array = end_index+1;
@@ -122,8 +155,6 @@ boolean length_matches_command_format(char command_type, int end_index){
   } else {
     return false;
   }
-
-  
 }
 
 bool command_suitable_for_mode(char recieved_char){
@@ -167,6 +198,8 @@ void process_message_step(char recieved_char){
       } else {
         //If STX appears and the sequence has already started,
         //It is corrupted.
+        //At this point, message_processing is false
+        //And it does not get added.
         corrupted_message = true;
         
       }
@@ -195,8 +228,6 @@ void process_message_step(char recieved_char){
             //and move the gantry.
             if(is_idle){
               is_idle = false;
-            } else {
-              is_action_modifying = true;
             }
             
             new_message_processing = false;
@@ -213,19 +244,63 @@ void process_message_step(char recieved_char){
     }
 }
 
+
+//Resets collected char data
 void corrupt_message_clear(){
-    //The message is corrupted, so clear it.
     //Declare that a new message is not being processed
-    //Declare that the current message has been found to be
-    //corrupted.
 
     //Note that corrupted messages
-    //also cover commands given in unsuitable OP states.
+    //include commands given in unsuitable OP states.
     message_recieved_counter = 0;
     new_message_processing = false;
     memset( message_recieved_char, '\0' , max_message_length );
 }
 
+
 //Need function for origin return
 
+
+
 //Need function for calculating
+//From idle conditions.
+void setup_starting_command(char action){
+  if(action == 'A'){
+    //Requesting data of opstatus
+    //No setup required
+    continue();
+  }else if(action == 'G'){
+    //Requesting data on full grid occupancy
+    //
+  }else if(action == 'C'){
+    //Informing manual change to cell
+    
+  }else if(action == 'S'){
+    //Requesting movement of two parts
+    
+  }else if(action == 'P'){
+    //Requesting storage of one part
+    
+  }else if(action == 'R'){
+    //Requesting retrieval of one part
+    
+  }else if(action == 'E'){
+    //Requesting emergency stop
+    
+  }else{
+    //ERROR
+  }
+  
+
+}
+
+
+//Function for 'A' command
+void op_state_query(){
+  Serial.print(special_chars[0]);
+  if(is_idle){
+    Serial.print('I');
+  } else {
+    Serial.print('A');
+  }
+  Serial.println(special_chars[1]);
+}
