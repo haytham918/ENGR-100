@@ -31,4 +31,4 @@ Now, you should see a screen with a 5x5 board and three modes for you to pick: R
 Checkout the [Demonstration Video](https://youtu.be/w0IdrNhn2UM) that describes the whole mechanism of the robot and also the guidelines for the user-interface.
 
 ## Contact
-Yunxuan "Haytham" Tang — [yunxuant@umich.edu](mailto: yunxuant@umich.edu)
+Yunxuan "Haytham" Tang — [yunxuant@umich.edu](mailto:yunxuant@umich.edu)
