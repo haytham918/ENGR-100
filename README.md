@@ -17,7 +17,7 @@ git clone https://github.com/haytham918/Gantry-Robot.git
 ### Interface
 After you have set up the repo in your local directory. Follow the following direction to run the User-Interface:
 
-```Open Processing``` -> ```Open Sketch``` -> ```/DevelopmentCode/storageGridTest/storageGridTest.pde``` -> Press the ```Play``` button to start.
+```Open Processing``` -> ```Open Sketch``` -> ```Gantry-Robot/DevelopmentCode/storageGridTest/storageGridTest.pde``` -> Press the ```Play``` button to start.
 
 Now, you should see a screen with a 5x5 board and three modes for you to pick: Reallocation, Retrieval, Storage.
 
